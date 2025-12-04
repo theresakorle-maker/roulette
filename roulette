@@ -1,0 +1,77 @@
+import random
+
+def roulette_spin():
+    """Simuliert das Drehen des Rouletterads und gibt die Gewinnzahl (0-36) zurück."""
+    # Ein Standard-Rouletterad hat die Zahlen 0 bis 36.
+    return random.randint(0, 36)
+
+def play_roulette():
+    """Hauptfunktion zur Steuerung des Spiels."""
+    print("Willkommen beim Roulette! 🎰")
+    print("Das Rad hat die Zahlen 0 bis 36.")
+
+    # Eingabe des Guthabens (Bankroll)
+    try:
+        current_balance = int(input("Geben Sie Ihr Startguthaben ein: "))
+        if current_balance <= 0:
+            print("Das Guthaben muss positiv sein.")
+            return
+    except ValueError:
+        print("Ungültige Eingabe für das Guthaben.")
+        return
+
+    while current_balance > 0:
+        print(f"\n--- Ihr aktuelles Guthaben: ${current_balance} ---")
+
+        # Eingabe der Wette
+        try:
+            bet_amount = int(input("Geben Sie den Einsatzbetrag ein: "))
+            if bet_amount <= 0 or bet_amount > current_balance:
+                print("Ungültiger Einsatz. Er muss größer als 0 und kleiner/gleich Ihrem Guthaben sein.")
+                continue
+        except ValueError:
+            print("Ungültige Eingabe für den Einsatz.")
+            continue
+
+        # Eingabe der gewählten Zahl
+        try:
+            chosen_number = int(input("Wählen Sie eine Zahl zum Wetten (0 bis 36): "))
+            if not 0 <= chosen_number <= 36:
+                print("Ungültige Zahl. Bitte wählen Sie eine Zahl zwischen 0 und 36.")
+                continue
+        except ValueError:
+            print("Ungültige Eingabe für die Zahl.")
+            continue
+
+        print(f"\nRoulette-Drehung läuft... Sie wetten ${bet_amount} auf die Zahl {chosen_number}.")
+        
+        # Die Drehung
+        winning_number = roulette_spin()
+
+        print(f"Die Kugel landet auf der Zahl: **{winning_number}**!")
+        
+        # Auswertung der Wette (Straight Up-Wette zahlt 35:1)
+        if winning_number == chosen_number:
+            winnings = bet_amount * 35
+            current_balance += winnings
+            print(f"🎉 **GEWONNEN!** Die Gewinnzahl ist Ihre gewählte Zahl.")
+            print(f"Sie gewinnen ${winnings}.")
+        else:
+            current_balance -= bet_amount
+            print(f"😞 **VERLOREN.** Die Kugel ist nicht auf {chosen_number} gelandet.")
+        
+        # Frage, ob der Spieler weiterspielen möchte
+        if current_balance > 0:
+            play_again = input("Möchten Sie eine weitere Runde spielen? (ja/nein): ").lower()
+            if play_again != 'ja':
+                break
+        else:
+            print("\nIhr Guthaben ist aufgebraucht. Spiel beendet.")
+
+
+    print(f"\n--- Spiel beendet. Ihr Endguthaben: ${current_balance} ---")
+    print("Danke fürs Spielen!")
+
+# Starten des Spiels
+if __name__ == "__main__":
+    play_roulette()
