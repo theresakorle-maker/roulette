@@ -1,0 +1,110 @@
+import random
+
+def roulette_spin():
+    """Simuliert den Wurf der Kugel beim Europäischen Roulette (0-36)."""
+    return random.randint(0, 36)
+
+def check_six_line_win(spin_result, bet_line_start):
+    """
+    Überprüft, ob die Six-Line-Wette gewonnen hat.
+    """
+    if bet_line_start not in range(1, 32, 3):
+        return False
+        
+    winning_numbers = list(range(bet_line_start, bet_line_start + 6))
+    
+    return spin_result in winning_numbers
+
+def play_again(current_bankroll):
+    """
+    Prüft, ob der Spieler weiterspielen kann und möchte.
+    """
+    if current_bankroll <= 0:
+        print("\n🛑 **SPIEL VORBEI!** Ihr Guthaben ist auf 0 oder weniger gesunken.")
+        return False
+    
+    while True:
+        choice = input("\nMöchten Sie eine weitere Runde spielen? (j/n): ").lower()
+        if choice == 'j':
+            return True
+        elif choice == 'n':
+            print(f"\n👋 Vielen Dank fürs Spielen! Sie beenden das Spiel mit einem Guthaben von: {current_bankroll}")
+            return False
+        else:
+            print("Ungültige Eingabe. Bitte 'j' für Ja oder 'n' für Nein eingeben.")
+
+
+def play_roulette_six_line_loop():
+    """Hauptfunktion für das Six-Line Roulette Spiel in einer Schleife."""
+    
+    # 1. Initialisierung des Guthabens
+    try:
+        initial_bankroll = int(input("💰 Geben Sie Ihr gewünschtes **Startguthaben** ein: "))
+        if initial_bankroll <= 0:
+            print("Das Startguthaben muss positiv sein.")
+            return
+            
+        bankroll = initial_bankroll
+        print(f"Ihr Startguthaben wurde auf: **{bankroll}** festgelegt.")
+
+    except ValueError:
+        print("Ungültige Eingabe für das Startguthaben.")
+        return
+
+    # Hauptschleife für das Spiel
+    while bankroll > 0:
+        print("\n" + "="*40)
+        print(f"**NEUE RUNDE.** Aktuelles Guthaben: {bankroll}")
+        
+        # 2. Einsatz und Wette abfragen
+        try:
+            # Einsatz abfragen und validieren
+            wager_valid = False
+            while not wager_valid:
+                wager = int(input("Wie hoch ist Ihr Einsatz? "))
+                
+                if wager <= 0:
+                    print("Der Einsatz muss positiv sein.")
+                elif wager > bankroll:
+                    print(f"Sie haben nicht genug Guthaben! Maximaler Einsatz: {bankroll}.")
+                else:
+                    wager_valid = True
+
+            # Wettauswahl
+            print("\nVerfügbare Six-Line-Wetten (Startzahl des Bereichs):")
+            print("1: (1-6) | 4: (4-9) | 7: (7-12) | ... | 31: (31-36)")
+            
+            bet_start = int(input("Geben Sie die **Startzahl** Ihres Six-Line-Bereichs ein (1, 4, 7, ..., 31): "))
+
+            if bet_start not in range(1, 32, 3):
+                print("Ungültige Startnummer. Runde wird abgebrochen.")
+                continue # Springt zum Anfang der Schleife
+                
+        except ValueError:
+            print("Ungültige Eingabe. Bitte nur ganze Zahlen eingeben.")
+            continue # Springt zum Anfang der Schleife
+
+        # 3. Spiel ausführen
+        print("\n--- Das Rad dreht sich! ---")
+        winning_number = roulette_spin()
+        print(f"Die Kugel landet auf der Zahl: **{winning_number}**")
+        
+        # 4. Bankroll anpassen
+        if check_six_line_win(winning_number, bet_start):
+            payout = wager * 5
+            bankroll += payout 
+            print(f"\n🎉 **GEWONNEN!** Gewinn: +{payout}")
+        else:
+            bankroll -= wager
+            print(f"\n😞 **VERLOREN.** Verlust: -{wager}")
+        
+        print(f"Ihr neues Guthaben beträgt: **{bankroll}**")
+        
+        # 5. Weiterspielen oder beenden?
+        if not play_again(bankroll):
+            break # Beendet die Hauptschleife
+
+    print("\nSpiel beendet.")
+
+# Spiel starten
+play_roulette_six_line_loop()
